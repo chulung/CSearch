@@ -12,10 +12,17 @@
     </properties>
     <dependencies>
 
+            <dependency>
+                <groupId>com.hankcs</groupId>
+                <artifactId>hanlp-solr-plugin</artifactId>
+                <version>1.0.3</version>
+                <scope>system</scope>
+                <systemPath>${project.basedir}/lib/hanlp-solr-plugin-1.0.3.jar</systemPath>
+            </dependency>
         <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <version>${lucene.version}</version>
+            <groupId>com.hankcs</groupId>
+            <artifactId>hanlp</artifactId>
+            <version>portable-1.2.8</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
