@@ -7,8 +7,11 @@
         </layout>
     </appender>
  
-    <root level="INFO">
+    <root level="ERROR">
         <appender-ref ref="console" />
         <appender-ref ref="file" />
     </root>
+    <logger name="com.chulung.csearch">
+        <level value="debug" />
+    </logger>
 </configuration>
