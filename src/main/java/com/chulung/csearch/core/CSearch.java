@@ -38,8 +38,9 @@ import static com.chulung.csearch.core.CSearchDocument.TITLE;
  */
 
 @Component
-public class CSearchIndex implements InitializingBean {
+public class CSearch implements InitializingBean {
 
+    public static final int DEFAULT_ROW = 10;
     private Logger logger= LoggerFactory.getLogger(this.getClass());
 
     private Directory fsDirectory;
@@ -53,35 +54,43 @@ public class CSearchIndex implements InitializingBean {
     private DirectoryReader reader;
     private IndexWriter indexWriter;
 
+
+    public boolean createIndex(CSearchDocument doc){
+       return this.createIndex(Arrays.asList(doc));
+    }
+
     /**
      * Creates a new index or overwrites an existing one.
      *
-     * @param doc
+     * @param docs
      *
      */
-    public boolean createIndex(CSearchDocument doc) {
+    public boolean createIndex(List<CSearchDocument> docs) {
         IndexWriter writer = null;
         try {
             writer = this.getIndexWriter();
-            logger.info("tryDelete id={}",doc.getId());
-            writer.deleteDocuments(new Term(ID,doc.getId()));
-            Document document = new Document();
-            document.add(new StringField(ID, doc.getId(), Field.Store.YES));
-            document.add(new TextField(TITLE, doc.getTitle(), Field.Store.YES));
-            document.add(new TextField(CONTEXT, doc.getContext(), Field.Store.YES));
-            writer.addDocument(document);
-            logger.info("createIndex id={}",doc.getId());
-        } catch (IOException e) {
+            for (CSearchDocument doc:docs){
+                logger.info("tryDelete id={}",doc.getId());
+                writer.deleteDocuments(new Term(ID,doc.getId()));
+                Document document = new Document();
+                document.add(new StringField(ID, doc.getId(), Field.Store.YES));
+                //HanLp区分大小写，所以全转小写
+                document.add(new TextField(TITLE, doc.getTitle().toLowerCase(), Field.Store.YES));
+                document.add(new TextField(CONTEXT, doc.getContext().toLowerCase(), Field.Store.YES));
+                writer.addDocument(document);
+                logger.info("createIndex id={}",doc.getId());
+            }
+        } catch (Exception e) {
             try {
                 writer.rollback();
-            } catch (IOException e1) {
+            } catch (Exception e1) {
             }
             return false;
         } finally {
             if (writer != null)
                 try {
                     writer.commit();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -98,12 +107,12 @@ public class CSearchIndex implements InitializingBean {
             IndexWriter writer = this.getIndexWriter();
             writer.deleteAll();
             writer.commit();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public List<CSearchDocument> search(String queryStr) throws ParseException, IOException, InvalidTokenOffsetsException {
+    public List<CSearchDocument> search(String queryStr,int num) throws Exception {
         if (StringUtils.isBlank(queryStr)) {
             return Collections.EMPTY_LIST;
         }
@@ -114,28 +123,43 @@ public class CSearchIndex implements InitializingBean {
         //搜索标题和内容两个字段
         String[] fields = {TITLE, CONTEXT};
         QueryParser queryParser = new MultiFieldQueryParser(fields, analyzer);
-        Query query = queryParser.parse(queryStr);
+        //HanLp区分大小写，所以全转小写
+        Query query = queryParser.parse(queryStr.toLowerCase());
         IndexSearcher searcher = new IndexSearcher(getReader());
-        TopDocs topDocs = searcher.search(query, 10);
+        TopDocs topDocs = searcher.search(query, num);
         //设置高亮格式
         Highlighter highlighter = new Highlighter(this.cSearchConfig.getHighLighterFormatter(), new QueryScorer(query));
+        //设置返回字符串长度
+        highlighter.setTextFragmenter(new SimpleFragmenter(150));
         List<CSearchDocument> result = new ArrayList<>();
         for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
             Document doc = searcher.doc(scoreDoc.doc);
             //这里的.replaceAll("\\s*", "")是必须的，\r\n这样的空白字符会导致高亮标签错位
-            String context = highlighter.getBestFragment(analyzer, CONTEXT, doc.get(CONTEXT).replaceAll("\\s*", ""));
-            String title = highlighter.getBestFragment(analyzer, TITLE, doc.get(TITLE).replaceAll("\\s*", ""));
-            result.add(new CSearchDocument(doc.get(CSearchDocument.ID), title, context));
+            String context = doc.get(CONTEXT).replaceAll("\\s*", "");
+            //没有高亮字符会返回null
+            String highContext = highlighter.getBestFragment(analyzer, CONTEXT, context);
+            String title = doc.get(TITLE).replaceAll("\\s*", "");
+            String highTitle = highlighter.getBestFragment(analyzer, TITLE, title);
+            result.add(new CSearchDocument(doc.get(CSearchDocument.ID), highTitle==null?title:highTitle, highContext==null?subContext(context):highContext));
         }
         return result;
     }
 
     /**
+     * 根据 {@link CSearchConfig#fragmentSize}截取片段长度
+     * @param context
+     * @return
+     */
+    private String subContext(String context) {
+        return  context.length()>cSearchConfig.getFragmentSize()?context.substring(0,cSearchConfig.getFragmentSize()):context;
+    }
+
+    /**
      * reader 返回当前reader 如果文档有更新则新打开一个
      * @return
-     * @throws IOException
+     * @throws Exception
      */
-    private DirectoryReader getReader() throws IOException {
+    private DirectoryReader getReader() throws Exception {
         if (reader==null){
             this.reader=DirectoryReader.open(fsDirectory);
         }
@@ -150,10 +174,14 @@ public class CSearchIndex implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         fsDirectory = FSDirectory.open(Paths.get(this.cSearchConfig.getIndexStorePath()));
-        indexWriter = new IndexWriter(fsDirectory, new IndexWriterConfig(analyzer));
+         indexWriter=new IndexWriter(fsDirectory, new IndexWriterConfig(analyzer));
     }
 
-    private IndexWriter getIndexWriter() throws IOException {
+    private IndexWriter getIndexWriter() throws Exception {
         return indexWriter;
+    }
+
+    public List<CSearchDocument> search(String key) throws Exception {
+        return  this.search(key, DEFAULT_ROW);
     }
 }

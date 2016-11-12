@@ -24,7 +24,22 @@ public class CSearchConfig implements InitializingBean {
     @Value("${csearch.highlighter.closing}")
     private String highlighterClosing;
 
+    /**
+     * 搜索结果片段长度
+     */
+    @Value("${csearch.fragmentSize}")
+    private Integer fragmentSize;
+
     private Formatter highLighterFormatter;
+
+    public Integer getFragmentSize() {
+        return fragmentSize;
+    }
+
+    public void setFragmentSize(Integer fragmentSize) {
+        this.fragmentSize = fragmentSize;
+    }
+
 
     public String getIndexStorePath() {
         return indexStorePath;
@@ -65,6 +80,9 @@ public class CSearchConfig implements InitializingBean {
             this.highLighterFormatter=new SimpleHTMLFormatter();
         }else {
             this.highLighterFormatter=new SimpleHTMLFormatter(this.highlighterOpening,this.highlighterClosing);
+        }
+        if (fragmentSize==null){
+            fragmentSize=150;
         }
     }
 }

@@ -7,6 +7,7 @@ import org.apache.lucene.index.IndexableField;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by chulung on 2016/11/10.
@@ -21,6 +22,8 @@ public class CSearchDocument {
 
     public CSearchDocument(String id,String title,String context){
         if (id==null) throw new IllegalArgumentException("id can't be null!");
+        if (title==null) throw new IllegalArgumentException("title can't be null!");
+        if (context==null) throw new IllegalArgumentException("context can't be null!");
         this.id=id;
         this.title=title;
         this.context=context;

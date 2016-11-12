@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.chulung</groupId>
     <artifactId>csearch</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.9-SNAPSHOT</version>
     <name>csearch</name>
     <properties>
         <spring.version>4.2.3.RELEASE</spring.version>
@@ -17,6 +17,8 @@
             <artifactId>commons-lang3</artifactId>
             <version>${commons-lang3.version}</version>
         </dependency>
+        <!--lucene start-->
+        <!-- 这个插件没有maven版本，手动依赖-->
         <dependency>
             <groupId>com.hankcs</groupId>
             <artifactId>hanlp-solr-plugin</artifactId>
@@ -24,6 +26,7 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/hanlp-solr-plugin-1.0.3.jar</systemPath>
         </dependency>
+
         <dependency>
             <groupId>com.hankcs</groupId>
             <artifactId>hanlp</artifactId>
@@ -44,6 +47,8 @@
             <artifactId>lucene-highlighter</artifactId>
             <version>${lucene.version}</version>
         </dependency>
+
+        <!--lucene end-->
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>

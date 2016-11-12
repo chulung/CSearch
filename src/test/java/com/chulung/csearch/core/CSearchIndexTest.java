@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 public class CSearchIndexTest {
     private Logger logger= LoggerFactory.getLogger(this.getClass());
     @Autowired
-    private CSearchIndex cSearchIndex;
+    private CSearch cSearchIndex;
 
     @Autowired
     private CSearchConfig cSearchConfig;
