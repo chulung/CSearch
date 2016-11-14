@@ -1,4 +1,4 @@
-package com.chulung;
+package com.chulung.csearch.core;
 
 import com.hankcs.lucene.HanLPAnalyzer;
 import org.apache.lucene.analysis.Analyzer;

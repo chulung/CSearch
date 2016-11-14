@@ -1,5 +1,6 @@
 /.settings/
 /target/
+/src/test/resources/indexstore/
 /.project
 /.classpath
 *.iml

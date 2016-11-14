@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
+ * 相关配置信息
  * Created by chulung on 2016/11/7.
  */
 @Component
@@ -18,9 +19,15 @@ public class CSearchConfig implements InitializingBean {
     @Value("${csearch.indexStorePath}")
     private String indexStorePath;
 
+    /**
+     * 高亮标签
+     */
     @Value("${csearch.highlighter.opening}")
     private String highlighterOpening;
 
+    /**
+     * 高亮标签
+     */
     @Value("${csearch.highlighter.closing}")
     private String highlighterClosing;
 

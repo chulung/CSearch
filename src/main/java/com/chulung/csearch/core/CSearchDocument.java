@@ -16,8 +16,17 @@ public class CSearchDocument {
     public static final String ID = "id";
     public static  final  String TITLE="title";
     public  static  final  String CONTEXT="context";
+    /**
+     * 唯一ID，创建前会根据id删除已有的
+     */
     private String id;
+    /**
+     * 文档标题
+     */
     private String title;
+    /**
+     * 文档内容
+     */
     private String context;
 
     public CSearchDocument(String id,String title,String context){

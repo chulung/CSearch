@@ -19,18 +19,19 @@ import static org.junit.Assert.*;
  */
 @RunWith(value = SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:csearch.xml")
-public class CSearchIndexTest {
+public class CSearchTest {
     private Logger logger= LoggerFactory.getLogger(this.getClass());
     @Autowired
-    private CSearch cSearchIndex;
+    private CSearchImpl cSearchIndex;
 
     @Autowired
     private CSearchConfig cSearchConfig;
 
     @Test
-    public void testCreateAndSearch() throws Exception {
+    public void testCSearch() throws Exception {
         //清除
         this.cSearchIndex.clearAll();
+        //剔除html标签
         String context = this.readToString("src/test/resources/test.html").replaceAll("</?[^<]+>", "");
         String id = "1";
         String title = "什么是"+"函数"+"式编程";
@@ -57,11 +58,14 @@ public class CSearchIndexTest {
         doc.setTitle(doc.getTitle());
         cSearchIndex.createIndex(doc);
         //此时结果为2篇
-        assertEquals(2,cSearchIndex.search(key).size());
+        result= cSearchIndex.search(key);
+        result.forEach(System.out::println);
+        assertEquals(2, result.size());
         //清除
         this.cSearchIndex.clearAll();
+        //再次查询结果为空
         List<CSearchDocument> list = cSearchIndex.search(key);
-        assertTrue("list.size()="+list.size(),list.isEmpty());
+        assertTrue(list.isEmpty());
     }
 
     public String readToString(String fileName) {
