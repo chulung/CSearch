@@ -155,8 +155,8 @@ public class CSearchImpl implements InitializingBean,CSearch {
         if (reader==null){
             this.reader=DirectoryReader.open(fsDirectory);
         }
-        //有更新则重新打开，保证实时查询
-        DirectoryReader newReader = DirectoryReader.openIfChanged((DirectoryReader)reader,  getIndexWriter(), false);//reader.reopen();      // 读入新增加的增量索引内容，满足实时索引需求
+        //有更新则重新打开,读入新增加的增量索引内容，满足实时查询需求
+        DirectoryReader newReader = DirectoryReader.openIfChanged((DirectoryReader)reader,  getIndexWriter(), false);
         if (newReader != null) {
             reader.close();
             reader = newReader;
