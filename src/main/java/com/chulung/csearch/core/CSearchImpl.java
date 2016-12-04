@@ -72,7 +72,7 @@ public class CSearchImpl implements InitializingBean,CSearch {
                 document.add(new StringField(ID, doc.getId(), Field.Store.YES));
                 //HanLp区分大小写，所以全转小写
                 document.add(new TextField(TITLE, doc.getTitle().toLowerCase(), Field.Store.YES));
-                document.add(new TextField(CONTEXT, doc.getContext().toLowerCase(), Field.Store.YES));
+                document.add(new TextField(CONTEXT, doc.getContent().toLowerCase(), Field.Store.YES));
                 writer.addDocument(document);
                 logger.info("createIndex id={}",doc.getId());
             }
@@ -127,23 +127,23 @@ public class CSearchImpl implements InitializingBean,CSearch {
         for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
             Document doc = searcher.doc(scoreDoc.doc);
             //这里的.replaceAll("\\s*", "")是必须的，\r\n这样的空白字符会导致高亮标签错位
-            String context = doc.get(CONTEXT).replaceAll("\\s*", "");
+            String content = doc.get(CONTEXT).replaceAll("\\s*", "");
             //没有高亮字符会返回null
-            String highContext = highlighter.getBestFragment(analyzer, CONTEXT, context);
+            String highContext = highlighter.getBestFragment(analyzer, CONTEXT, content);
             String title = doc.get(TITLE).replaceAll("\\s*", "");
             String highTitle = highlighter.getBestFragment(analyzer, TITLE, title);
-            result.add(new CSearchDocument(doc.get(CSearchDocument.ID), highTitle==null?title:highTitle, highContext==null?subContext(context):highContext));
+            result.add(new CSearchDocument(doc.get(CSearchDocument.ID), highTitle==null?title:highTitle, highContext==null?subContext(content):highContext));
         }
         return result;
     }
 
     /**
      * 根据 {@link CSearchConfig#fragmentSize}截取片段长度
-     * @param context
+     * @param content
      * @return
      */
-    private String subContext(String context) {
-        return  context.length()>cSearchConfig.getFragmentSize()?context.substring(0,cSearchConfig.getFragmentSize()):context;
+    private String subContext(String content) {
+        return  content.length()>cSearchConfig.getFragmentSize()?content.substring(0,cSearchConfig.getFragmentSize()):content;
     }
 
     /**

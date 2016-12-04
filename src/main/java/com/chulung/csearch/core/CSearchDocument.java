@@ -1,21 +1,12 @@
 package com.chulung.csearch.core;
 
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.IndexableField;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Created by chulung on 2016/11/10.
  */
 public class CSearchDocument {
     public static final String ID = "id";
     public static  final  String TITLE="title";
-    public  static  final  String CONTEXT="context";
+    public  static  final  String CONTEXT="content";
     /**
      * 唯一ID，创建前会根据id删除已有的
      */
@@ -27,15 +18,15 @@ public class CSearchDocument {
     /**
      * 文档内容
      */
-    private String context;
+    private String content;
 
-    public CSearchDocument(String id,String title,String context){
+    public CSearchDocument(String id,String title,String content){
         if (id==null) throw new IllegalArgumentException("id can't be null!");
         if (title==null) throw new IllegalArgumentException("title can't be null!");
-        if (context==null) throw new IllegalArgumentException("context can't be null!");
+        if (content ==null) throw new IllegalArgumentException("content can't be null!");
         this.id=id;
         this.title=title;
-        this.context=context;
+        this.content = content;
     }
 
     public String getTitle() {
@@ -46,12 +37,12 @@ public class CSearchDocument {
         this.title = title;
     }
 
-    public String getContext() {
-        return context;
+    public String getContent() {
+        return content;
     }
 
-    public void setContext(String context) {
-        this.context = context;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public String getId() {
@@ -67,7 +58,7 @@ public class CSearchDocument {
         return "CSearchDocument{" +
                 "id='" + id + '\'' +
                 ", title='" + title + '\'' +
-                ", context='" + context + '\'' +
+                ", content='" + content + '\'' +
                 '}';
     }
 }

@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.io.*;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -32,7 +31,7 @@ public class CSearchTest {
         //清除
         this.cSearchIndex.clearAll();
         //剔除html标签
-        String context = this.readToString("src/test/resources/test.html").replaceAll("</?[^<]+>", "");
+        String context = TestUtil.readToString("src/test/resources/test.html").replaceAll("</?[^<]+>", "");
         String id = "1";
         String title = "什么是"+"函数"+"式编程";
         String titleHighLight="什么是"+cSearchConfig.getHighlighterOpening()+"函数"+cSearchConfig.getHighlighterClosing()+"式编程";
@@ -50,7 +49,7 @@ public class CSearchTest {
             assertTrue(cSearchDocument.getTitle()+"\n"+titleHighLight,cSearchDocument.getTitle().equals(titleHighLight));
             //包含高亮的key
             String highLightKey = cSearchConfig.getHighlighterOpening() + key + cSearchConfig.getHighlighterClosing();
-            assertTrue(cSearchDocument.getContext().contains(highLightKey));
+            assertTrue(cSearchDocument.getContent().contains(highLightKey));
         });
 
         //修改id 当做新文档
@@ -68,27 +67,6 @@ public class CSearchTest {
         assertTrue(list.isEmpty());
     }
 
-    public String readToString(String fileName) {
-        String encoding = "UTF-8";
-        File file = new File(fileName);
-        Long filelength = file.length();
-        byte[] filecontent = new byte[filelength.intValue()];
-        try {
-            FileInputStream in = new FileInputStream(file);
-            in.read(filecontent);
-            in.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            return new String(filecontent, encoding);
-        } catch (UnsupportedEncodingException e) {
-            System.err.println("The OS does not support " + encoding);
-            e.printStackTrace();
-            return null;
-        }
-    }
+
 
 }
